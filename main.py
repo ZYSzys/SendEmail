@@ -46,7 +46,7 @@ def sendmail(subject,msg,toaddrs,fromaddr,smtpaddr,password, fzip):
         s.login(fromaddr,password)  #登录邮箱
         s.sendmail(fromaddr, toaddrs, mail_msg.as_string()) #发送邮件
         s.quit()
-        print 'Done!'
+        print 'Send Done!'
     except Exception as e:
        print e, "Error: unable to send email"
        print traceback.format_exc()
@@ -62,7 +62,6 @@ if __name__ == '__main__':
     dirname = '201605070523'
     usr = u'物联网'
     fzip = dirname+usr+'161.zip'
-    #z = ZipDir()
-    #z.zip_dir(dirname, fzip)
-    #fzip = '201605070523zys.zip'
+    z = ZipDir()
+    z.zip_dir(dirname, fzip)
     sendmail(subject,msg,toaddrs,fromaddr,smtpaddr,password,fzip)
