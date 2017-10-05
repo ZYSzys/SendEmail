@@ -14,9 +14,9 @@ git clone https://github.com/ZYSzys/SendEmail.git
 
 ## 使用方法
 
+进入SendEmail文件夹下将send.py的email和password改为自己的并保存
 在当前目录下输入：
 ```
-cd SendEmail
 python send.py
 ```
 运行并按提示输入
