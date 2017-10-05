@@ -12,7 +12,19 @@ from zipfiles import ZipDir
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-def sendmail(subject,msg,toaddrs,fromaddr,smtpaddr,password, fzip):
+def Trans(fzip):
+	data = open(fzip, 'rb')
+	ctype, encoding = mimetypes.guess_type(fzip)
+	maintype, subtype = ctype.split('/', 1)
+	file_msg = email.MIMEBase.MIMEBase(maintype, subtype)
+	file_msg.set_payload(data.read())
+	data.close()
+	email.encoders.encode_base64(file_msg)
+	basename = os.path.basename(fzip)
+	file_msg.add_header('Content-Disposition', 'attachment', filename=str(basename))
+	return file_msg
+
+def SendMail(subject,msg,toaddrs,fromaddr,smtpaddr,password, fzip):
     '''
     @subject:邮件主题
     @msg:邮件内容
@@ -28,17 +40,7 @@ def sendmail(subject,msg,toaddrs,fromaddr,smtpaddr,password, fzip):
     mail_msg['From'] =fromaddr
     mail_msg['To'] = ','.join(toaddrs)
 
-    data = open(fzip, 'rb')
-    ctype, encoding = mimetypes.guess_type(fzip)
-    maintype, subtype = ctype.split('/', 1)
-    file_msg = email.MIMEBase.MIMEBase(maintype, subtype)
-    file_msg.set_payload(data.read())
-    data.close()
-    email.encoders.encode_base64(file_msg)
-    basename = os.path.basename(fzip)
-    file_msg.add_header('Content-Disposition', 'attachment', filename=str(basename))
-
-    mail_msg.attach(file_msg)
+    mail_msg.attach(Trans(fzip))
     mail_msg.attach(MIMEText(msg, 'html', 'utf-8'))
     try:
         s = smtplib.SMTP()
@@ -52,16 +54,22 @@ def sendmail(subject,msg,toaddrs,fromaddr,smtpaddr,password, fzip):
        print traceback.format_exc()
 
 if __name__ == '__main__':
-    fromaddr = "17367077526@163.com"
-    smtpaddr = "smtp.163.com"
-    toaddrs = ["1220736035@qq.com"]
-    subject = "C++作业"
-    password = ".........."
-    msg = "C++作业"
+	smtpaddr = "smtp.163.com"
+	fromaddr = "17367077526@163.com"
+	password = ".........."
 
-    dirname = '201605070523'
-    usr = u'物联网'
-    fzip = dirname+usr+'161.zip'
-    z = ZipDir()
-    z.zip_dir(dirname, fzip)
-    sendmail(subject,msg,toaddrs,fromaddr,smtpaddr,password,fzip)
+	toaddrs = []
+	to = str(raw_input("Send to (1220736035@qq.com): "))
+	toaddrs.append(to)
+
+	subject = raw_input("Subject (C++作业): ")
+	msg = subject
+
+	dirname = raw_input('which directory (201605070523): ')
+	usr = u'物联网'
+	fzip = dirname+usr+'161.zip'
+
+	z = ZipDir()
+	z.zip_dir(dirname, fzip)
+	SendMail(subject,msg,toaddrs,fromaddr,smtpaddr,password,fzip)
+	print 'Completed!'
